@@ -11,30 +11,27 @@ def create_graph(filename):
     prison_file = open(filename, 'r')
     lines = prison_file.readlines()
     cameras = []
-    print(f'lines len: {len(lines)}, lines: {lines}')
+    prison_graph = Graph()
 
-    prisoner_vertex = Graph()
-    prisoner_vertex.add_vertex('0, 0')  # prisoner always starts at 0, 0
-    print(f'Prisoner starting location: {prisoner_vertex.adjacency_list}\n')
+    yx_value = lines[0].strip()
+    print(f'yx_value : {yx_value}, rows={yx_value[0]} , columns'
+          f'={yx_value[-1]}')
 
-    for i, line in enumerate(lines):
-        print(f'Line {i}: {line.strip()} and type is "{line.__class__}"')
-        if i == 0:  # finds first line, determines size of the graph
-            # prison_graph = [int(line[0:1]), int(line[2:3])]
-            prison_graph = Graph()
-            prison_graph.add_vertex(f'{line[0:1]},{line[2:3]}')
-            print(f'Graph size {prison_graph.adjacency_list}')
+    # construct the graph object by taking in the first line of lines
+    # and iterate through defining vertices
+    for i in range(0, int(yx_value[-1])):  # iterates rows
+        for j in range(0, int(yx_value[0])):  # iterates columns
+            prison_graph.add_vertex(Vertex(f'{i},{j}', False))
+            print(getattr(Vertex(f'{j},{i}'), 'label'), end=' ')
+            print(getattr(Vertex(f'{j},{i}'), 'visited'))
 
-            exit_vertex = Vertex('exit', False)
-            exit_vertex.add_vertex(f'{int(line[0:1]) - 1},'
-                                   f'{int(line[2:3]) - 1}')
-            print(f'exit vertex {exit_vertex.adjacency_list}\n')
+    for x in prison_graph.adjacency_list:
+        print(getattr(x, 'label'))
 
-        else:  # the rest of the lines are coordinates of the cameras
-            cameras.append(f'{int(line[0:1])},{int(line[:-2])}')
-            print(f'adding line {i} to the camera list')
-            print(f'cameras: {cameras}\n')
-            # print(f'Camera #{i - 1} is located at ({cameras[i]})')
+    # for x in getattr(prison_graph, 'adjacency_list'):
+    #     print(getattr(Vertex(prison_graph.adjacency_list[x]), 'label'))
+
+
 
     # The following line is here as a placeholder. Replace
     # this line with the real return values once you
