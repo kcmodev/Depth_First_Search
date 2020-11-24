@@ -3,40 +3,63 @@ from graph import Graph, Vertex
 
 
 def create_graph(filename):
-    # TO-DO: read the lines in the specified file
-    # to create a Graph object. Returns 3 values:
-    #
-    #     prison_graph, prisoner_vertex, exit_vertex
+    """
+    Reads file and creates a grid from the first line of text
+    Rows then columns. Assigns prisoner and exit vertex.
 
-    prison_file = open(filename, 'r')
-    lines = prison_file.readlines()
-    cameras = []
+    :param filename: File being parsed
+    :return: returns graph, prisoner vertex, and vertex exit
+    """
+
     prison_graph = Graph()
+    prisoner_vertex = None
+    exit_vertex = None
+    vertices = {}
+    cameras = set()
 
-    yx_value = lines[0].strip()
-    print(f'yx_value : {yx_value}, rows={yx_value[0]} , columns'
-          f'={yx_value[-1]}')
+    with open(filename, 'r') as graph_file:
+        row, col = map(int, graph_file.readline().split())
+        print(f'Graph Size... Rows: {row} Columns: {col}')
+        for line in graph_file:
+            line = line.strip()
+            cam_x, cam_y = map(int, line.split())
+            cameras.add((cam_x, cam_y))
+            print(f'Camera at: {cam_x},{cam_y}')
 
-    # construct the graph object by taking in the first line of lines
-    # and iterate through defining vertices
-    for i in range(0, int(yx_value[-1])):  # iterates rows
-        for j in range(0, int(yx_value[0])):  # iterates columns
-            prison_graph.add_vertex(Vertex(f'{i},{j}', False))
-            print(getattr(Vertex(f'{j},{i}'), 'label'), end=' ')
-            print(getattr(Vertex(f'{j},{i}'), 'visited'))
+    for i in range(row):  # iterate over rows
+        for j in range(col):  # iterate over columns
+            vert = Vertex(f'{i},{j}')
+            vertices[(i, j)] = vert
 
-    for x in prison_graph.adjacency_list:
-        print(getattr(x, 'label'))
+            if vert in cameras:
+                vert.has_camera = True
 
-    # for x in getattr(prison_graph, 'adjacency_list'):
-    #     print(getattr(Vertex(prison_graph.adjacency_list[x]), 'label'))
+            prison_graph.add_vertex(vert)
 
+    # determine if there is a bordering cell without a camera and create
+    # an undirected edge
+    for i in range(row):
+        for j in range(col):
+            source_vertex = vertices[(i, j)]
+            # if nothing up & no camera
+            destination_vertex = (i - 1, j)
+            if destination_vertex in vertices:
+                prison_graph.add_undirected_edge(source_vertex,
+                                                 destination_vertex)
+            # if nothing down & no camera
+            # if nothing right & no camera
+            # if nothing left & no camera
 
+    for x in vertices:
+        print(x, getattr(vertices[x], 'label'))
+
+    # for key, values in prison_graph.adjacency_list.items():
+    #     print(f'{getattr(key, "label")} : {values}')
 
     # The following line is here as a placeholder. Replace
     # this line with the real return values once you
     # load them from the prison data file.
-    return None, None, None
+    return prison_graph, prisoner_vertex, exit_vertex
 
 
 def count_exit_paths(g, start_vertex, exit_vertex):
